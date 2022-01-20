@@ -16,6 +16,7 @@ public abstract class PromotionFactory {
     public static MultiBuyPromotion multiBuyPromotion(Cart cart, Character sku, int bulBuyCount,BigDecimal bulkBuyCost) {
         MultiBuyPromotion promotion = new MultiBuyPromotion(cart,sku);
         promotion.setBulkBuyCount(bulBuyCount);
+        promotion.setBulkBuyCost(bulkBuyCost);
         return promotion;
     }
 }

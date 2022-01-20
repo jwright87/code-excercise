@@ -1,5 +1,7 @@
 package wright.john.promotions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import wright.john.model.Cart;
 import wright.john.model.Item;
 
@@ -8,59 +10,54 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MultiBuyPromotion extends Promotion {
+    private static final Logger log = LoggerFactory.getLogger(MultiBuyPromotion.class);
 
     private int bulkBuyCount;
-    private BigDecimal fixedPrice;
+    private BigDecimal bulkBuyCost;
+    private BigDecimal total = BigDecimal.ZERO;
 
     public MultiBuyPromotion(Cart cart, Character sku) {
         super(cart, sku);
     }
 
+     void setBulkBuyCost(BigDecimal bulkBuyCost) {
+        this.bulkBuyCost = bulkBuyCost;
+    }
 
     public BigDecimal applyPromotion() {
 
         List<Item> items = findItemsWithPromotionSku();
-
-        if (items.size() < bulkBuyCount) {
-            priceNonPromotionalItems(items);
-            return total;
-        } else {
+        if (items.size() == bulkBuyCount) {
+            log.debug("Applying bulk discount");
             applyMultiBuy(items);
-
-            List<Item> extraItems = items.subList(bulkBuyCount, items.size() - 1);
-            priceNonPromotionalItems(extraItems);
+        } else {
+            log.debug("Unable to apply bulk discount, only %d items in cart," +
+                    "%d required", items.size(), bulkBuyCount);
         }
-
         return total;
 
     }
 
-    public void priceNonPromotionalItems(List<Item> items) {
-        items.forEach(item -> cart.priceItem(item));
-    }
 
     private List<Item> findItemsWithPromotionSku() {
-        return cart.getItems().stream().filter(p -> p.getSku() == sku)
+        List<Item> items =  cart.getItems().stream().filter(p -> p.getSku() == sku)
                 .collect(Collectors.toList());
+        if (items.size()>bulkBuyCount) {
+            return items.subList(0,bulkBuyCount);
+        }else {
+            return items;
+        }
     }
 
     private void applyMultiBuy(List<Item> items) {
-        items.subList(0, bulkBuyCount).forEach(item -> {
+        items.forEach(item -> {
             cart.priceItem(item, BigDecimal.valueOf(0));
-            cart.addToPriceTotal(fixedPrice);
             item.setCharged(true);
         });
+        total = total.add(bulkBuyCost);
     }
 
-    private void setAllItemsAsCharged(Cart cart, List<Item> items) {
-        cart.getItems().stream().forEach(i -> i.setCharged(true));
-    }
-
-    public int getBulkBuyCount() {
-        return bulkBuyCount;
-    }
-
-    public void setBulkBuyCount(int bulkBuyCount) {
+    void setBulkBuyCount(int bulkBuyCount) {
         this.bulkBuyCount = bulkBuyCount;
     }
 }
