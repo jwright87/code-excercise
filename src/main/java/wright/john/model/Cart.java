@@ -58,10 +58,6 @@ public class Cart {
        total = total.add(amount);
     }
 
-    public void setItemCharged(Item item) {
-        item.setCharged(true);
-    }
-
     public BigDecimal getTotal() {
         return total;
     }

@@ -88,7 +88,7 @@ class CartTest {
         cart.getItems().forEach(item -> {
             System.out.println(item.getPrice());
             cart.addToPriceTotal(item.getPrice());
-            cart.setItemCharged(item);
+            item.setCharged(true);
         });
         assertThat(cart.getTotal()).isEqualTo(BigDecimal.valueOf(100));
     }
