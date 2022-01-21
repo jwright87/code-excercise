@@ -36,10 +36,9 @@ public class PercentDiscountPromotion extends Promotion {
             BigDecimal discountPrice = calcPercentage(percentDiscount, item.getPrice());
            item.setCharged(true);
            item.setPrice(discountPrice);
+           item.setPromotion(this.getClass().getSimpleName());
         }
         return Utils.addBigDecimalsFromItems(applicableItems);
-//                .stream().map(item -> item.getPrice())//TODO remove;
-//                .reduce(BigDecimal.ZERO,BigDecimal::add);
 
     }
 
@@ -63,7 +62,7 @@ public class PercentDiscountPromotion extends Promotion {
         return percentDiscount;
     }
 
-    void setPercentDiscount(BigDecimal percentDiscount) {
+    public void setPercentDiscount(BigDecimal percentDiscount) {
         this.percentDiscount = percentDiscount;
     }
 }

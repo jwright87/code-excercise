@@ -9,8 +9,6 @@ public class Utils {
 
     /**
      * Convenience method to sum BigDecimals.
-     * @param numbers
-     * @return
      */
     public static BigDecimal addBigDecimalsFromItems(List<Item> numbers) {
         return numbers.stream().map(item -> item.getPrice())
@@ -19,8 +17,6 @@ public class Utils {
 
     /**
      * Remove extra trailing zeros from BigDecimals to avoid failing an equality check when the number is equivalent.
-     * @param value
-     * @return
      */
     public static BigDecimal stripDecimalZeros(BigDecimal value ) {
         if ( value == null )

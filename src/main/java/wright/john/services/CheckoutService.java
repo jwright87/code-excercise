@@ -1,5 +1,6 @@
 package wright.john.services;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,13 +20,16 @@ public class CheckoutService {
         BigDecimal finalTotal = BigDecimal.ZERO;
 
         for (Item item : cart.getItems()) {
-            log.debug("Item {} priced at  {}",item.getName(),item.getPrice());
+            log.debug("Item {} priced at  {}", item.getName(), item.getPrice());
             Promotion promotion = cart.getPromotionForItem(item);
             if (promotion == null) {
                 item.setCharged(true);
                 log.debug("{} charged at {}", item.getName(), item.getPrice());
-            }else{
+            } else {
                 promotion.applyPromotion();
+            }
+            if (!item.isCharged()) {
+                item.setCharged(true);
             }
         }
 
@@ -47,7 +51,7 @@ public class CheckoutService {
                 if (promotion != null) {
 
                 }
-                String hasPromotion = promotion != null ? promotion.getClass().getSimpleName() : " No Promotion";
+                String hasPromotion = determineIfPromotionApplied(cart,item, promotion);
                 builder.append(String.format("%s  | %.2f |%s |\n", item.getName(), item.getPrice(), hasPromotion));
                 builder.append(Strings.repeat("-", 30));
                 builder.append("\n");
@@ -60,6 +64,14 @@ public class CheckoutService {
             System.out.println(receipt);
             return receipt;
         }
+    }
+
+    @VisibleForTesting
+    String determineIfPromotionApplied(Cart cart,Item item, Promotion promotion) {
+        if (promotion ==  null) return "No Promotion";
+        if (!cart.itemHasPromotion(item)) return "No Promotion";
+        return  item.getPrice().compareTo(Item.createItem(item.getSku()).getPrice()) < 0
+                ? promotion.getClass().getSimpleName() : "No Promotion";
     }
 }
 

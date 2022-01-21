@@ -7,33 +7,59 @@ import wright.john.model.Item;
 import wright.john.promotions.MultiBuyPromotion;
 import wright.john.promotions.PercentDiscountPromotion;
 import wright.john.promotions.PromotionFactory;
+import wright.john.services.CheckoutService;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    /**
-     *
-     * @param args
-     */
+    private CheckoutService checkoutService = new CheckoutService();
+    private Cart cart = new Cart();
+    private MultiBuyPromotion multiBuyPromotion;
+    private PercentDiscountPromotion percentDiscountPromotion;
+private List<Item> items;
     public static void main(String[] args) {
+        new Main().processPayment(args);
+    }
 
-        Cart cart = new Cart();
+    public void processPayment(String[] args) {
+        createFruitItemsFromProgramInput(args);
 
-        Arrays.stream(args).map(str -> str.toCharArray()).map(c -> c[0]).forEach(c -> {
-            cart.addItems(Item.createItem(c));
-        });
+        addAndPrintItemsAddedToCart(items);
 
-        log.info("{} items added to shoppng list", cart.getItems().size());
-        cart.getItems().forEach(item -> System.out.println(item.getName()));
+        initialisePromotions();
 
-        MultiBuyPromotion multiBuyPromotion = PromotionFactory.multiBuyPromotion(cart, 'C', 3, BigDecimal.valueOf(40));
-        PercentDiscountPromotion percentDiscountPromotion = PromotionFactory.percentDiscountPromotion(cart, 'A', BigDecimal.valueOf(15));
+        addPromotionsToCart();
 
+        checkoutItems();
+    }
+
+    private void createFruitItemsFromProgramInput(String[] args) {
+        items = Arrays.stream(args).map(fruit -> Item.createItem(fruit)).collect(Collectors.toList());
+    }
+
+    private void checkoutItems() {
+        checkoutService.checkout(cart);
+        checkoutService.printReceipt(cart);
+    }
+
+    private void addPromotionsToCart() {
         cart.addPromotion(multiBuyPromotion);
         cart.addPromotion(percentDiscountPromotion);
+    }
+
+    private void initialisePromotions() {
+        multiBuyPromotion = PromotionFactory.multiBuyPromotion(cart, 'C', 3, BigDecimal.valueOf(40));
+        percentDiscountPromotion = PromotionFactory.percentDiscountPromotion(cart, 'A', BigDecimal.valueOf(15));
+    }
+
+    private void addAndPrintItemsAddedToCart(List<Item> items) {
+        cart.addItems(items);
+        log.info("{} items added to shopping list", cart.getItems().size());
     }
 }

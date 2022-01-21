@@ -35,6 +35,10 @@ public class Cart {
         this.items.addAll(List.of(newItems));
     }
 
+    public void addItems(List<Item> newItems) {
+        this.items.addAll(newItems);
+    }
+
     public List<Item> getItems() {
         return items;
     }

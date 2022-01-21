@@ -36,4 +36,13 @@ Carrot  | 42.50 |PercentDiscountPromotion |
 Banana  | 30.00 |No Promotion |
 ------------------------------
 Price Total: £146.50
+
+## Rebuilding with gradle.
+
+If changes need to be made trun the gradle command
+
+```shell
+./gradlew clean build sportbugsMain spotbugsTest installDist
+```
+And the updated scripts will be in the build/distributions folder.
 ______________________________

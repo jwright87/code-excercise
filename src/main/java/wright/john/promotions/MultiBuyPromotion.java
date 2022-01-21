@@ -10,14 +10,11 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.math.RoundingMode.HALF_UP;
-
 public class MultiBuyPromotion extends Promotion {
     private static final Logger log = LoggerFactory.getLogger(MultiBuyPromotion.class);
 
     private int bulkBuyCount;
     private BigDecimal bulkBuyCost;
-    private BigDecimal total = BigDecimal.ZERO;
 
     public MultiBuyPromotion(Cart cart, Character sku) {
         super(cart, sku);
@@ -37,8 +34,7 @@ public class MultiBuyPromotion extends Promotion {
             log.debug("Unable to apply bulk discount, only %d items in cart," +
                     "%d required", items.size(), bulkBuyCount);
         }
-        return total;
-
+return total;
     }
 
 
@@ -57,6 +53,7 @@ public class MultiBuyPromotion extends Promotion {
             item.setCharged(true);
             BigDecimal pricePerItem = bulkBuyCost.divide(BigDecimal.valueOf(bulkBuyCount),RoundingMode.HALF_UP);
             item.setPrice(pricePerItem);
+            item.setPromotion(this.getClass().getSimpleName());
         });
         total = total.add(bulkBuyCost);
     }
