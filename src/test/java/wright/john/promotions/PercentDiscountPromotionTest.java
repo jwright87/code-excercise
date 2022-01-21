@@ -20,7 +20,7 @@ class PercentDiscountPromotionTest {
 
     @BeforeEach
     public void setup() {
-        cart.addItems(/*orange,*/carrot);
+        cart.addItems(carrot);
     }
 
     @Test

@@ -34,9 +34,28 @@ class ItemTest {
     }
 
     @Test
+    public void shouldCreateAllByName() {
+        assertThat(Item.createItem("Carrot").getName().equals('A'));
+        assertThat(Item.createItem("Banana").getName().equals('B'));
+        assertThat(Item.createItem("ApPle").getName().equals('C'));
+        assertThat(Item.createItem("orange").getName().equals('D'));
+    }
+
+
+
+
+
+    @Test
     public void shouldThrowExceptionWhenPassedUnknownSku() {
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
                 Item.createItem('E');
+        });
+
+    }
+    @Test
+    public void shouldThrowExceptionWhenPassedUnknownFruit() {
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
+                Item.createItem("Grapefruit");
         });
 
     }

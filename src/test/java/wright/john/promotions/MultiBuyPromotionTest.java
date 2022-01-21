@@ -32,7 +32,6 @@ class MultiBuyPromotionTest {
         BigDecimal total = promotion.applyPromotion();
         assertThat(total).isEqualTo(BigDecimal.valueOf(65));
 
-       // Check correct items marked as charged.
         assertTrue(orange.isCharged());
         assertTrue(orange2.isCharged());
         assertTrue(orange3.isCharged());
