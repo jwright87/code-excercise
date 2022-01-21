@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'application'
+    id "com.github.spotbugs" version "5.0.5"
 }
 
 group 'wright.john'
@@ -20,6 +21,23 @@ application {
     mainClass.set("wright.john.Main")
 }
 
+spotbugs {
+    ignoreFailures = false
+    showStackTraces = true
+    showProgress = true
+    effort = 'default'
+    reportLevel = 'default'
+    visitors = [ 'FindSqlInjection', 'SwitchFallthrough' ]
+    omitVisitors = [ 'FindNonShortCircuit' ]
+    reportsDir = file("$buildDir/spotbugs")
+//    includeFilter = file("include.xml")
+//    excludeFilter = file("exclude.xml")
+//    baselineFile = file("baseline.xml")
+//    onlyAnalyze = [ 'com.foobar.MyClass', 'com.foobar.mypkg.*' ]
+    maxHeapSize = '1g'
+    extraArgs = [ '-nested:false' ]
+    jvmArgs = [ '-Duser.language=ja' ]
+}
 
 
 dependencies {
@@ -35,6 +53,8 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.22.0'
+
+    spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.11.0'
 }
 
 jar {

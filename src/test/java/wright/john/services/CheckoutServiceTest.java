@@ -2,6 +2,9 @@ package wright.john.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import wright.john.Utils;
 import wright.john.model.Cart;
 import wright.john.model.Item;
 import wright.john.promotions.PromotionFactory;
@@ -12,6 +15,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CheckoutServiceTest {
+
+    private static final Logger log = LoggerFactory.getLogger(CheckoutServiceTest.class);
 
     private Cart cart = new Cart();
 
@@ -41,8 +46,9 @@ class CheckoutServiceTest {
 
     @Test
     public void shouldApplyMultiBuyPromotion() {
-        cart.addPromotion(orange.getSku(), PromotionFactory.multiBuyPromotion(cart, orange.getSku(), 2,
+        cart.addPromotion(PromotionFactory.multiBuyPromotion(cart, orange.getSku(), 2,
                 BigDecimal.valueOf(20)));
+
         BigDecimal finalTotal = checkoutService.checkout(cart);
         assertThat(finalTotal).isEqualTo(BigDecimal.valueOf(140));
         cart.getItems().forEach(item -> assertTrue(item.isCharged()));
@@ -51,9 +57,29 @@ class CheckoutServiceTest {
 
     @Test
     public void shouldApplyPercentDiscount() {
-        cart.addPromotion(orange.getSku(), PromotionFactory.percentDiscountPromotion(cart, orange.getSku(), BigDecimal.valueOf(25)));
-        String finalTotal = checkoutService.checkout(cart).toString().replace('0','\t').trim();
-        assertEquals(finalTotal, "142.5");
+        log.debug("items in Cart: {}",cart.getItems());
+        cart.addPromotion(PromotionFactory.percentDiscountPromotion(cart, orange.getSku(), BigDecimal.valueOf(25)));
+        BigDecimal finalTotal = checkoutService.checkout(cart);
+        log.debug("Final Total: {}, Cart Total: {}",finalTotal,cart.getTotal());
+        assertThat(finalTotal).isEqualTo(cart.getTotal());
+        assertEquals(Utils.stripDecimalZeros(finalTotal), BigDecimal.valueOf(142.5));
         cart.getItems().forEach(item -> assertTrue(item.isCharged()));
+        checkoutService.printReceipt(cart);
     }
+
+    @Test
+    public void shouldPrintReceiptWithNoPromos() {
+     BigDecimal finalTotal = checkoutService.checkout(cart);
+     String receipt = checkoutService.printReceipt(cart);
+     assertThat(receipt).containsOnlyOnce("Receipt");
+     assertThat(receipt).containsOnlyOnce("Carrot");
+     assertThat(receipt).containsOnlyOnce("Banana");
+     assertThat(receipt).contains("Apple");
+     assertThat(receipt).contains("Orange");
+     assertThat(cart.getItems().size()).isEqualTo(6);
+
+     assertThat(checkoutService.checkout(cart)).isEqualTo(BigDecimal.valueOf(150));
+    }
+
+
 }

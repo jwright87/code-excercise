@@ -6,8 +6,11 @@ import wright.john.model.Cart;
 import wright.john.model.Item;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.math.RoundingMode.HALF_UP;
 
 public class MultiBuyPromotion extends Promotion {
     private static final Logger log = LoggerFactory.getLogger(MultiBuyPromotion.class);
@@ -20,7 +23,7 @@ public class MultiBuyPromotion extends Promotion {
         super(cart, sku);
     }
 
-     void setBulkBuyCost(BigDecimal bulkBuyCost) {
+    void setBulkBuyCost(BigDecimal bulkBuyCost) {
         this.bulkBuyCost = bulkBuyCost;
     }
 
@@ -40,19 +43,20 @@ public class MultiBuyPromotion extends Promotion {
 
 
     private List<Item> findItemsWithPromotionSku() {
-        List<Item> items =  cart.getItems().stream().filter(p -> p.getSku() == sku)
+        List<Item> items = cart.getItems().stream().filter(p -> p.getSku() == sku)
                 .collect(Collectors.toList());
-        if (items.size()>bulkBuyCount) {
-            return items.subList(0,bulkBuyCount);
-        }else {
+        if (items.size() > bulkBuyCount) {
+            return items.subList(0, bulkBuyCount);
+        } else {
             return items;
         }
     }
 
     private void applyMultiBuy(List<Item> items) {
         items.forEach(item -> {
-            cart.priceItem(item, BigDecimal.valueOf(0));
             item.setCharged(true);
+            BigDecimal pricePerItem = bulkBuyCost.divide(BigDecimal.valueOf(bulkBuyCount),RoundingMode.HALF_UP);
+            item.setPrice(pricePerItem);
         });
         total = total.add(bulkBuyCost);
     }
