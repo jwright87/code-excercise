@@ -9,14 +9,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Cart {
 
     private static final Logger log = LoggerFactory.getLogger(Cart.class);
 
     private List<Item> items = new ArrayList<>();
-    private BigDecimal total = new BigDecimal(0);
-
     private Map<Character, Promotion> promotionMap = new HashMap<>();
 
     public boolean itemHasPromotion(Item item) {
@@ -28,8 +27,8 @@ public class Cart {
         return promotionMap.get(item.getSku());
     }
 
-    public void addPromotion(char sku, Promotion promotion) {
-        promotionMap.put(sku, promotion);
+    public void addPromotion( Promotion promotion) {
+        promotionMap.put(promotion.getSku(), promotion);
     }
 
     public void addItems(Item... newItems) {
@@ -54,11 +53,11 @@ public class Cart {
 
     }
 
-    public void addToPriceTotal(BigDecimal amount) {
-       total = total.add(amount);
-    }
-
     public BigDecimal getTotal() {
-        return total;
+        List<BigDecimal> prices =  items.stream().map(item -> {
+            return item.getPrice();
+        }).collect(Collectors.toList());
+
+        return prices.stream().reduce(BigDecimal.ZERO,BigDecimal::add);
     }
 }

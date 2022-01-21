@@ -6,6 +6,8 @@ import wright.john.promotions.MultiBuyPromotion;
 import wright.john.promotions.PromotionFactory;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,7 +38,7 @@ class CartTest {
     @Test
     public void itemShouldHavePromotion() {
 
-        cart.addPromotion(itemC.getSku(), PromotionFactory.percentDiscountPromotion(cart, itemC.getSku(), BigDecimal.valueOf(10)));
+        cart.addPromotion(PromotionFactory.percentDiscountPromotion(cart, itemC.getSku(), BigDecimal.valueOf(10)));
         assertTrue(cart.itemHasPromotion(itemC));
 
     }
@@ -55,7 +57,7 @@ class CartTest {
     @Test
     public void shouldAddPromotion() {
         cart.addItems(itemA, itemA);
-        cart.addPromotion(itemA.getSku(),
+        cart.addPromotion(
                 PromotionFactory.multiBuyPromotion(cart, itemA.getSku(), 3, BigDecimal.valueOf(120)));
         assertThat(cart.getPromotionForItem(itemA)).isInstanceOf(MultiBuyPromotion.class);
         assertThat(cart.getPromotionForItem(itemB)).isNull();
@@ -63,7 +65,7 @@ class CartTest {
 
     @Test
     public void skuShouldHavePromotion() {
-        cart.addPromotion(itemB.getSku(), PromotionFactory.percentDiscountPromotion(cart, itemB.getSku(), BigDecimal.valueOf(30)));
+        cart.addPromotion(PromotionFactory.percentDiscountPromotion(cart, itemB.getSku(), BigDecimal.valueOf(30)));
 
         assertTrue(cart.itemHasPromotion(itemB));
         assertFalse(cart.itemHasPromotion(itemA));
@@ -85,11 +87,7 @@ class CartTest {
 
     @Test
     public void shouldTotalCharges() {
-        cart.getItems().forEach(item -> {
-            System.out.println(item.getPrice());
-            cart.addToPriceTotal(item.getPrice());
-            item.setCharged(true);
-        });
+
         assertThat(cart.getTotal()).isEqualTo(BigDecimal.valueOf(100));
     }
 

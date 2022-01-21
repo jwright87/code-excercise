@@ -21,6 +21,15 @@ class UtilsTest {
     }
 
     @Test
+    public void shouldGracefullyHandleNullValuesForSummingNumbers() {
+        assertThat(Utils.stripDecimalZeros(null)).isNull();
+    }
+    @Test
+    public void shouldGracefullyHandleNullValuesForTrailingZeros() {
+        assertThat(Utils.stripDecimalZeros(null)).isNull();
+    }
+
+    @Test
     public void shouldStripTrailingZeros() {
         BigDecimal trailZeroDecimal = Utils.stripDecimalZeros(BigDecimal.valueOf(125.00));
         BigDecimal comparison = BigDecimal.valueOf(125);
